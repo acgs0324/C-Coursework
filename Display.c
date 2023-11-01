@@ -137,13 +137,17 @@ bool depth_first_search(int* robot_x_num, int* robot_y_num, direction *robot_dir
         sleep(1000);
         for (int i = 0; i < grid_num; i++) {
             for (int j = 0; j < grid_num; j++) {
-                grid[i][j].visited = 1;
+                if(grid[i][j].visited == 1 && grid[i][j].type != 1) {
+                    grid[i][j].visited = 0;
+                } else {
+                    grid[i][j].visited = 1;
+                }
             }
         }
     }
     grid[*robot_x_num][*robot_y_num].visited = 1;
+
     // Define the 4 possible movement directions (up, down, left, right)
-    
     int dy[] = {-1, 1, 0, 0};
     int dx[] = {0, 0, -1, 1};
     for (int i = 0; i < 4; i++) {
@@ -281,17 +285,13 @@ int main(int argc, char **argv) {
     GenerateMarkers(marker_num, marker_x, marker_y, grid_num, grid, grid[robot_x_num][robot_y_num].x, grid[robot_x_num][robot_y_num].y);
     GenerateWalls(marker_num, marker_x, marker_y, grid_num, grid, grid[robot_x_num][robot_y_num].x, grid[robot_x_num][robot_y_num].y);
     printf("marker_x: %d, marker_y: %d\n", marker_x[0], marker_y[0]);
+    
     DrawCell(grid_num, grid_size, grid);
     DrawGrid(x_offset, y_offset, grid_size, grid_num);
     PlaceRobot(grid[robot_x_num][robot_y_num].x, grid[robot_x_num][robot_y_num].y, robot_dir, grid_size);
-    sleep(200);
     // int* Step_record = NULL;
     // Step_record = (int*)malloc(sizeof(int)*20);
     int Step_record[500];
-    i = 0;
-    clear();
-    DrawCell(grid_num, grid_size, grid);
-    DrawGrid(x_offset, y_offset, grid_size, grid_num);
     // MoveFoward(&robot_x_num, &robot_y_num, &robot_dir, grid_num, grid);
 
     while(marker_num > 1) {
@@ -299,24 +299,25 @@ int main(int argc, char **argv) {
         clear();
         DrawCell(grid_num, grid_size, grid);
         DrawGrid(x_offset, y_offset, grid_size, grid_num);
-        // MoveFoward(&robot_x_num, &robot_y_num, &robot_dir, grid_num, grid);
+        // PlaceRobot(grid[robot_x_num][robot_y_num].x, grid[robot_x_num][robot_y_num].y, robot_dir, grid_size);
         depth_first_search(&robot_x_num, &robot_y_num, &robot_dir, grid_size, grid_num, grid);
         marker_num--;
         sleep(1000);
+        
         for (int i = 0; i < grid_num; i++) {
-        for (int j = 0; j < grid_num; j++) {
-            grid[i][j].visited = 0;
-            grid[i][j].robot = 0;
-            if (i == 0 || i == grid_num-1 || j == 0 || j == grid_num-1) {
-                grid[i][j].edge = 1;
-            } else {
-                grid[i][j].edge = 0;
-            }
-            if (grid[i][j].type == 1) {
-                grid[i][j].visited = 1;
+            for (int j = 0; j < grid_num; j++) {
+                grid[i][j].visited = 0;
+                grid[i][j].robot = 0;
+                if (i == 0 || i == grid_num-1 || j == 0 || j == grid_num-1) {
+                    grid[i][j].edge = 1;
+                } else {
+                    grid[i][j].edge = 0;
+                }
+                if (grid[i][j].type == 1) {
+                    grid[i][j].visited = 1;
+                }
             }
         }
-    }
         // if (grid[robot_x_num][robot_y_num].type == 3) {
         //     marker_num--;
         //     PlaceRobot(grid[robot_x_num][robot_y_num].x, grid[robot_x_num][robot_y_num].y, robot_dir, grid_size);
