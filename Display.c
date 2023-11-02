@@ -19,12 +19,26 @@ typedef struct {
     int robot; //0: no robot, 1: robot
 } Cell;
 
+typedef struct {
+    int array[1000];
+    int top;
+} StepStack;
+
+
 typedef enum {
     north = 0,
     east = 1,
     south = 2,
     west = 3
 } direction;
+
+void push(StepStack* step_record, int data) {
+    step_record->array[++step_record->top] = data;
+}
+
+int pop(StepStack* step_record) {
+    return step_record->array[step_record->top--];
+}
 
 void DrawCell(Cell grid[grid_num][grid_num]) {
     int i, j;
@@ -108,7 +122,7 @@ void GenerateWalls(int wall_num, int *wall_x, int *wall_y, Cell grid[grid_num][g
     }
 }
 
-void PlaceRobot(int x, int y, direction robot_dir, int grid_size) {
+void PlaceRobot(int x, int y, direction robot_dir) {
     setColour(blue);
     x = x+2;
     y = y+2;
@@ -130,7 +144,7 @@ void PlaceRobot(int x, int y, direction robot_dir, int grid_size) {
     sleep(100);
 }
 
-bool isValid(int x_num, int y_num, int grid_num) {
+bool isValid(int x_num, int y_num) {
     return (x_num >= 0 && x_num < grid_num && y_num >= 0 && y_num < grid_num);
 }
 
@@ -146,21 +160,22 @@ direction getDirection(int prev_robot_x_num, int prev_robot_y_num, int robot_x_n
     }
 }
 
-bool depth_first_search(int* robot_x_num, int* robot_y_num, int prev_robot_x_num, int prev_robot_y_num, int grid_size, int grid_num, Cell grid[grid_num][grid_num], direction *robot_dir) {
+bool depth_first_search(int* robot_x_num, int* robot_y_num, int prev_robot_x_num, int prev_robot_y_num, StepStack *step_record, Cell grid[grid_num][grid_num], direction *robot_dir) {
     //sleep(100);
     // printf("robot_x: %d, robot_y: %d\n", *robot_x_num, *robot_y_num);
     grid[*robot_x_num][*robot_y_num].visited = 1;
     clear();
     DrawCell(grid);
     DrawGrid(50, 50, grid_size, grid_num);
-    PlaceRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir, grid_size);
-    
+    PlaceRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir);
+    push(step_record, *robot_x_num);
+    push(step_record, *robot_y_num);
     if (grid[*robot_x_num][*robot_y_num].type == 3) {
         grid[*robot_x_num][*robot_y_num].type = 0;
         clear();
         DrawCell(grid);
         DrawGrid(50, 50, grid_size, grid_num);
-        PlaceRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir, grid_size);
+        PlaceRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir);
         sleep(1000);
         for (int i = 0; i < grid_num; i++) {
             for (int j = 0; j < grid_num; j++) {
@@ -172,6 +187,7 @@ bool depth_first_search(int* robot_x_num, int* robot_y_num, int prev_robot_x_num
                 grid[i][j].visited = 1;
             }
         }
+        return true;
     }
 
     // Define the 4 possible movement directions (north, east, south, west)
@@ -186,22 +202,30 @@ bool depth_first_search(int* robot_x_num, int* robot_y_num, int prev_robot_x_num
         int new_x = *robot_x_num + dx[i];
         int new_y = *robot_y_num + dy[i];
         sleep(100);
-        if (isValid(new_x, new_y, grid_num) && !grid[new_x][new_y].visited) {
+        if (isValid(new_x, new_y) && !grid[new_x][new_y].visited) {
             *robot_dir = i;
-            depth_first_search(&new_x, &new_y, *robot_x_num, *robot_y_num, grid_size, grid_num, grid, robot_dir);
-            // if(depth_first_search(&new_x, &new_y, grid_size, grid_num, grid)) {
-            //     return true;
-            // };
+            // depth_first_search(&new_x, &new_y, *robot_x_num, *robot_y_num, grid, robot_dir);
+            if(depth_first_search(&new_x, &new_y, *robot_x_num, *robot_y_num, step_record, grid, robot_dir)) {
+                return true;
+            };
         }
     }
-    *robot_dir = getDirection(prev_robot_x_num, prev_robot_y_num, *robot_x_num, *robot_y_num);
-    *robot_dir = (*robot_dir + 2) % 4;
-    clear();
-    DrawCell(grid);
-    DrawGrid(50, 50, grid_size, grid_num);
-    PlaceRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir, grid_size);
-    printf("Move from (%d, %d) to (%d, %d)\n", prev_robot_x_num, prev_robot_y_num, *robot_x_num, *robot_y_num);
+    // *robot_dir = getDirection(prev_robot_x_num, prev_robot_y_num, *robot_x_num, *robot_y_num);
+    // *robot_dir = (*robot_dir + 2) % 4;
+    // clear();
+    // DrawCell(grid);
+    // DrawGrid(50, 50, grid_size, grid_num);
+    // PlaceRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir);
+    // printf("Move from (%d, %d) to (%d, %d)\n", prev_robot_x_num, prev_robot_y_num, *robot_x_num, *robot_y_num);
     return false;
+}
+
+void initStack(StepStack* step_record) {
+    step_record->top = -1; // -1 indicates an empty stack
+}
+
+int isEmpty(StepStack* step_record) {
+    return step_record->top == -1;
 }
 
 void resetCell(Cell grid[grid_num][grid_num]) {
@@ -248,9 +272,12 @@ int main(int argc, char **argv) {
     
     DrawCell(grid);
     DrawGrid(x_offset, y_offset, grid_size, grid_num);
-    PlaceRobot(grid[robot_x_num][robot_y_num].x, grid[robot_x_num][robot_y_num].y, robot_dir, grid_size);
+    PlaceRobot(grid[robot_x_num][robot_y_num].x, grid[robot_x_num][robot_y_num].y, robot_dir);
 
     int prev_robot_x_num, prev_robot_y_num;
+
+    StepStack step_record;
+    step_record.top = -1;
 
     while(marker_num > 0) {
         if (robot_dir == north) {
@@ -272,7 +299,7 @@ int main(int argc, char **argv) {
         // DrawGrid(x_offset, y_offset, grid_size, grid_num);
         // PlaceRobot(grid[robot_x_num][robot_y_num].x, grid[robot_x_num][robot_y_num].y, robot_dir, grid_size);
 
-        depth_first_search(&robot_x_num, &robot_y_num, prev_robot_x_num, prev_robot_y_num, grid_size, grid_num, grid, &robot_dir);
+        depth_first_search(&robot_x_num, &robot_y_num, prev_robot_x_num, prev_robot_y_num, &step_record, grid, &robot_dir);
         
         marker_num--;
         
@@ -291,6 +318,19 @@ int main(int argc, char **argv) {
                     grid[i][j].visited = 1;
                 }
             }
+        }
+        while (!isEmpty(&step_record)) {
+            int y = pop(&step_record);
+            int x = pop(&step_record);
+            printf("x: %d, y: %d\n", x, y);
+            clear();
+            DrawCell(grid);
+            DrawGrid(50, 50, grid_size, grid_num);
+            robot_dir = getDirection(prev_robot_x_num, prev_robot_y_num, x, y);
+            //robot_dir = (robot_dir + 2) % 4;
+            PlaceRobot(grid[x][y].x, grid[x][y].y, robot_dir);
+            prev_robot_x_num = x;
+            prev_robot_y_num = y;
         }
     }
     return 0;
