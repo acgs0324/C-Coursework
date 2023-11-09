@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-void PlaceRobot(int x, int y, direction robot_dir) {
+void placeRobot(int x, int y, direction robot_dir) {
+    foreground();
+    clear();
     setColour(blue);
     x = x+2;
     y = y+2;

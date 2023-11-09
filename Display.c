@@ -11,16 +11,18 @@ const int x_offset = 50;
 const int y_offset = 50;
 const int grid_size = 50;
 const int grid_num = 10;
+int dx[] = {0, 1, 0, -1};
+int dy[] = {-1, 0, 1, 0};
 
 bool isValid(int x_num, int y_num) {
     return (x_num >= 0 && x_num < grid_num && y_num >= 0 && y_num < grid_num);
 }
 
-void drawRobot(Cell grid[grid_num][grid_num], int robot_x_num, int robot_y_num, direction robot_dir) {
+void drawBackground(Cell grid[grid_num][grid_num]) {
+    background();
     clear();
     DrawCell(grid);
     DrawGrid(50, 50, grid_size, grid_num);
-    PlaceRobot(grid[robot_x_num][robot_y_num].x, grid[robot_x_num][robot_y_num].y, robot_dir);
 }
 
 void drawMarkerOnRobot(Cell grid[grid_num][grid_num], int robot_x_num, int robot_y_num) {
@@ -34,8 +36,6 @@ void drawMarkerOnRobot(Cell grid[grid_num][grid_num], int robot_x_num, int robot
 
 void returnToStart(int robot_x_num, int robot_y_num, direction robot_dir, StepStack *step_record, Cell grid[grid_num][grid_num]) {
     int prev_robot_x_num, prev_robot_y_num;
-    int dx[] = {0, 1, 0, -1};
-    int dy[] = {-1, 0, 1, 0};
     // drawRobot(grid, robot_x_num, robot_y_num, robot_dir);
     sleep(1000);
     while (!isEmpty(step_record)) {
@@ -43,7 +43,8 @@ void returnToStart(int robot_x_num, int robot_y_num, direction robot_dir, StepSt
         robot_y_num = pop(step_record);
         robot_x_num = pop(step_record);
         // robot_dir = getDirection(prev_robot_x_num, prev_robot_y_num, robot_x_num, robot_y_num);
-        drawRobot(grid, robot_x_num, robot_y_num, robot_dir);
+        placeRobot(grid[robot_x_num][robot_y_num].x, grid[robot_x_num][robot_y_num].y, robot_dir);
+        // drawRobot(grid, robot_x_num, robot_y_num, robot_dir);
         prev_robot_x_num = robot_x_num;
         prev_robot_y_num = robot_y_num;
         for (int i = 0; i < 4; i++) {
@@ -62,21 +63,18 @@ void returnToStart(int robot_x_num, int robot_y_num, direction robot_dir, StepSt
 
 bool depth_first_search(int* robot_x_num, int* robot_y_num, int prev_robot_x_num, int prev_robot_y_num, StepStack *step_record, Cell grid[grid_num][grid_num], direction *robot_dir) {
     grid[*robot_x_num][*robot_y_num].visited = 1;
-
-    drawRobot(grid, *robot_x_num, *robot_y_num, *robot_dir);
+    
+    placeRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir);
     push(step_record, *robot_x_num);
     push(step_record, *robot_y_num);
     push(step_record, *robot_dir);
     
-    if (grid[*robot_x_num][*robot_y_num].type == 3) { // If marker is found
-        grid[*robot_x_num][*robot_y_num].type = 0;
-        drawRobot(grid, *robot_x_num, *robot_y_num, *robot_dir);
+    if (grid[*robot_x_num][*robot_y_num].type == marker) { // If marker is found
+        grid[*robot_x_num][*robot_y_num].type = empty;
+        drawBackground(grid);
+        placeRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir);
         return true;
     }
-
-    // Define the 4 possible movement directions (north, east, south, west)
-    int dx[] = {0, 1, 0, -1};
-    int dy[] = {-1, 0, 1, 0};
     
     for (int i = 0; i < 4; i++) {
         int new_x = *robot_x_num + dx[i];
@@ -102,12 +100,12 @@ bool depth_first_search(int* robot_x_num, int* robot_y_num, int prev_robot_x_num
         }
     }
 
-    *robot_dir = (getDirection(prev_robot_x_num, prev_robot_y_num, *robot_x_num, *robot_y_num) + 2) % 4;;
-    drawRobot(grid, prev_robot_x_num, prev_robot_y_num, *robot_dir);
+    *robot_dir = getDirection(*robot_x_num, *robot_y_num, prev_robot_x_num, prev_robot_y_num);
+    placeRobot(grid[prev_robot_x_num][prev_robot_y_num].x, grid[prev_robot_x_num][prev_robot_y_num].y, *robot_dir);
     push(step_record, prev_robot_x_num);
     push(step_record, prev_robot_y_num);
     push(step_record, *robot_dir);
-    
+
     return false;
 }
 
@@ -136,7 +134,9 @@ int main(int argc, char **argv) {
     GenerateWalls(wall_num, grid);
     GenerateMarkers(marker_num, grid, robot_x_num, robot_y_num);
 
-    drawRobot(grid, robot_x_num, robot_y_num, robot_dir);
+    drawBackground(grid);
+    placeRobot(grid[robot_x_num][robot_y_num].x, grid[robot_x_num][robot_y_num].y, robot_dir);
+
     int prev_robot_x_num, prev_robot_y_num;
 
     while(marker_num > 0) {

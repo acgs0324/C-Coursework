@@ -26,12 +26,16 @@ typedef enum {
     west = 3
 } direction;
 
+// Define the 4 possible movement directions (north, east, south, west)
+int dx[4];
+int dy[4];
+
 void DrawGrid(int, int ,int ,int);
 void DrawCell(Cell grid[grid_num][grid_num]);
 void initCell(Cell grid[grid_num][grid_num]);
 void resetCell(Cell grid[grid_num][grid_num]);
 void GenerateWalls(int, Cell grid[grid_num][grid_num]);
 void GenerateMarkers(int, Cell grid[grid_num][grid_num], int, int );
-void PlaceRobot(int, int, direction);
+void placeRobot(int, int, direction);
 direction initdirection(char* );
 direction getDirection(int, int, int, int);

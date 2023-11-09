@@ -17,11 +17,21 @@ bool isDuplicate(int *x, int *y, int *i, int j) {
 
 bool isValid(int , int );
 
+bool besideStart(int x, int y, Cell grid[grid_num][grid_num]) {
+
+    for (int i = 0; i < 4; i++) {
+        int new_x = x + dx[i];
+        int new_y = y + dy[i];
+        if (grid[new_x][new_y].type == start && isValid(new_x, new_y)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool dfs(int robot_x_num, int robot_y_num, int marker_x, int marker_y, Cell temp_grid[grid_num][grid_num]) {
 
     temp_grid[robot_x_num][robot_y_num].visited = 1;
-    int dx[] = {0, 1, 0, -1};
-    int dy[] = {-1, 0, 1, 0};
     
     if (robot_x_num == marker_x && robot_y_num == marker_y) {
         return true;
@@ -46,7 +56,7 @@ void GenerateWalls(int wall_num, Cell grid[grid_num][grid_num]) {
         int wall_x = rand()%grid_num; 
         int wall_y = rand()%grid_num;
 
-        if (grid[wall_x][wall_y].type == empty) {
+        if (grid[wall_x][wall_y].type == empty && !besideStart(wall_x, wall_y, grid)) {
             grid[wall_x][wall_y].type = wall;
             grid[wall_x][wall_y].visited = true;
             i++;
