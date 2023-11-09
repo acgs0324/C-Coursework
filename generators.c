@@ -17,9 +17,9 @@ bool isDuplicate(int *x, int *y, int *i, int j) {
 
 bool isValid(int , int );
 
-bool dfs(int robot_x_num, int robot_y_num, int marker_x, int marker_y, Cell grid[grid_num][grid_num]) {
+bool dfs(int robot_x_num, int robot_y_num, int marker_x, int marker_y, Cell temp_grid[grid_num][grid_num]) {
 
-    grid[robot_x_num][robot_y_num].visited = 1;
+    temp_grid[robot_x_num][robot_y_num].visited = 1;
     int dx[] = {0, 1, 0, -1};
     int dy[] = {-1, 0, 1, 0};
     
@@ -30,13 +30,12 @@ bool dfs(int robot_x_num, int robot_y_num, int marker_x, int marker_y, Cell grid
     for (int i = 0; i < 4; i++) {
         int new_x = robot_x_num + dx[i];
         int new_y = robot_y_num + dy[i];
-        if (isValid(new_x, new_y) && !grid[new_x][new_y].visited) {
-            if (dfs(new_x, new_y, marker_x, marker_y, grid)) {
+        if (isValid(new_x, new_y) && !temp_grid[new_x][new_y].visited) {
+            if (dfs(new_x, new_y, marker_x, marker_y, temp_grid)) {
                 return true;
             }
         }
     }
-    printf("cannot find marker\n");
     return false;
 }
 
@@ -56,20 +55,24 @@ void GenerateWalls(int wall_num, Cell grid[grid_num][grid_num]) {
 }
 
 void GenerateMarkers(int marker_num, Cell grid[grid_num][grid_num], int robot_x, int robot_y) {
+    int counter = 0;
     Cell temp_grid[grid_num][grid_num];
-    for (int k = 0; k < grid_num; k++) {
-            for (int s = 0; s < grid_num; s++) {
-                temp_grid[k][s] = grid[k][s];
-        }
-    }
 
     srand(time(NULL));
     int i = 0;
     while (i < marker_num) {
+        for (int k = 0; k < grid_num; k++) {
+            for (int s = 0; s < grid_num; s++) {
+                temp_grid[k][s] = grid[k][s];
+            }
+        }
+        if (counter > 1000) {
+            break;
+        }
         int marker_x = rand()%grid_num;
         int marker_y = rand()%grid_num;
         
-        if (grid[marker_x][marker_y].type == empty && dfs(robot_x, robot_y, marker_x, marker_y, grid)) {
+        if (grid[marker_x][marker_y].type == empty && dfs(robot_x, robot_y, marker_x, marker_y, temp_grid)) {
             grid[marker_x][marker_y].type = marker;
             i++;
             for (int k = 0; k < grid_num; k++) {

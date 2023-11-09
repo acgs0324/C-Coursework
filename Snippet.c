@@ -275,3 +275,45 @@ void MoveFoward(int* robot_x_num, int* robot_y_num, direction* dir, int grid_num
 //         printf("marker_x: %d, marker_y: %d\n", marker_x[i], marker_y[i]);
 //     }
 // }
+
+// while (!isEmpty(&step_record)) {
+        //     robot_y_num = pop(&step_record);
+        //     robot_x_num = pop(&step_record);
+        //     robot_dir = getDirection(prev_robot_x_num, prev_robot_y_num, robot_x_num, robot_y_num);
+        //     drawRobot(grid, robot_x_num, robot_y_num, robot_dir);
+        //     prev_robot_x_num = robot_x_num;
+        //     prev_robot_y_num = robot_y_num;
+        //     for (int i = 0; i < 4; i++) {
+        //         int new_x = robot_x_num + dx[i];
+        //         int new_y = robot_y_num + dy[i];
+        //         if (grid[new_x][new_y].type == start && isValid(new_x, new_y)) {
+        //             resetStack(&step_record);
+        //             push(&step_record, new_x);
+        //             push(&step_record, new_y);
+        //             printf("Home is found \n");
+        //         }
+        //     }
+        // }
+
+        
+// if (robot_dir == north) {
+        //     prev_robot_x_num = robot_x_num;
+        //     prev_robot_y_num = robot_y_num+1;
+        // } else if (robot_dir == east) {
+        //     prev_robot_x_num = robot_x_num-1;
+        //     prev_robot_y_num = robot_y_num;
+        // } else if (robot_dir == south) {
+        //     prev_robot_x_num = robot_x_num;
+        //     prev_robot_y_num = robot_y_num-1;
+        // } else if (robot_dir == west) {
+        //     prev_robot_x_num = robot_x_num+1;
+        //     prev_robot_y_num = robot_y_num;
+        // }
+
+    // grid[0][4].type = 1;
+    // grid[0][4].visited = true;
+    // grid[9][1].type = 1;
+    // grid[9][1].visited = true;
+    // grid[8][2].type = 1;
+    // grid[8][2].visited = true;
+    // grid[0][1].type = 3;

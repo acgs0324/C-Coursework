@@ -37,7 +37,7 @@ void DrawCell(Cell grid[grid_num][grid_num]) { //Paint the Cells
     }
 }
 
-void resetCell(Cell grid[grid_num][grid_num]) { //Reset the Cells
+void initCell(Cell grid[grid_num][grid_num]) { //Reset the Cells
     for (int i = 0; i < grid_num; i++) {
         for (int j = 0; j < grid_num; j++) {
             grid[i][j].x = x_offset + i*grid_size;
@@ -52,4 +52,14 @@ void resetCell(Cell grid[grid_num][grid_num]) { //Reset the Cells
             }
         }
     }
-} 
+}
+
+void resetCell(Cell grid[grid_num][grid_num]) { //Reset the Cells
+    for (int i = 0; i < grid_num; i++) {
+        for (int j = 0; j < grid_num; j++) {
+            if (grid[i][j].type != 1) {
+                grid[i][j].visited = 0;
+            }
+        }
+    }
+}
