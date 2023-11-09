@@ -1,14 +1,13 @@
 typedef struct {
-    int array[1000];
+    int* array;
     int top;
+    int capacity;
 } StepStack;
 
-void initStack(StepStack* );
-
+StepStack* createStack(int);
+int isFull(StepStack* );
 int isEmpty(StepStack* );
-
 void resetStack(StepStack* );
-
 void push(StepStack* , int);
-
 int pop(StepStack* );
+void destroyStack(StepStack* );

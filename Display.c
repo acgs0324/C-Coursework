@@ -117,13 +117,14 @@ int main(int argc, char **argv) {
 
     int robot_x_num = 0;
     int robot_y_num = 0;
-    StepStack step_record;
+    
+    // StepStack step_record;
     direction robot_dir = north;
 
     if (argc == 4) {
         robot_x_num = atoi(argv[1]);
         robot_y_num = atoi(argv[2]);
-        robot_dir = initdirection(argv[3]);
+        robot_dir = getInitDirection(argv[3]);
         grid[atoi(argv[1])][atoi(argv[2])].robot = 1;
         grid[atoi(argv[1])][atoi(argv[2])].type = 2;
     }
@@ -140,11 +141,13 @@ int main(int argc, char **argv) {
     int prev_robot_x_num, prev_robot_y_num;
 
     while(marker_num > 0) {
-        initStack(&step_record);
-        depth_first_search(&robot_x_num, &robot_y_num, prev_robot_x_num, prev_robot_y_num, &step_record, grid, &robot_dir); //Start DFS
+        // initStack(&step_record);
+        StepStack* step_record = createStack(100);
+        depth_first_search(&robot_x_num, &robot_y_num, prev_robot_x_num, prev_robot_y_num, step_record, grid, &robot_dir); //Start DFS
         printf("Marker left: %d\n", marker_num--);
         resetCell(grid);
-        returnToStart(robot_x_num, robot_y_num, robot_dir, &step_record, grid);
+        returnToStart(robot_x_num, robot_y_num, robot_dir, step_record, grid);
+        destroyStack(step_record);
         sleep(1000);
     }
     return 0;

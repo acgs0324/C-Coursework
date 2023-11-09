@@ -28,7 +28,7 @@ void placeRobot(int x, int y, direction robot_dir) {
     sleep(100);
 }
 
-direction initdirection(char* direction) {
+direction getInitDirection(char* direction) {
     char direction_c = tolower(direction[0]);
     if (direction_c == 'n') {
         return north;
@@ -55,3 +55,4 @@ direction getDirection(int prev_robot_x_num, int prev_robot_y_num, int robot_x_n
         return north; // Up
     }
 }
+

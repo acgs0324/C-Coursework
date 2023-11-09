@@ -37,5 +37,5 @@ void resetCell(Cell grid[grid_num][grid_num]);
 void GenerateWalls(int, Cell grid[grid_num][grid_num]);
 void GenerateMarkers(int, Cell grid[grid_num][grid_num], int, int );
 void placeRobot(int, int, direction);
-direction initdirection(char* );
+direction getInitDirection(char* );
 direction getDirection(int, int, int, int);
