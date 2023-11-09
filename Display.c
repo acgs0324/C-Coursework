@@ -107,6 +107,7 @@ bool depth_first_search(int* robot_x_num, int* robot_y_num, int prev_robot_x_num
     push(step_record, prev_robot_x_num);
     push(step_record, prev_robot_y_num);
     push(step_record, *robot_dir);
+    
     return false;
 }
 
