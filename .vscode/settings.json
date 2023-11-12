@@ -4,6 +4,13 @@
         "stdio.h": "c",
         "draw.h": "c",
         "stepstack.h": "c",
-        "ctype.h": "c"
+        "ctype.h": "c",
+        "stack.h": "c",
+        "stdlib.h": "c",
+        "robot.h": "c",
+        "stdbool.h": "c",
+        "time.h": "c",
+        "bitset": "c",
+        "optional": "c"
     }
 }

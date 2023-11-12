@@ -317,3 +317,105 @@ void MoveFoward(int* robot_x_num, int* robot_y_num, direction* dir, int grid_num
     // grid[8][2].type = 1;
     // grid[8][2].visited = true;
     // grid[0][1].type = 3;
+    
+void GenerateWalls(int wall_num, Cell grid[grid_num][grid_num]) {
+    srand(time(NULL));
+    int i = 0;
+    while (i < wall_num) {
+        int wall_x = rand()%grid_num; 
+        int wall_y = rand()%grid_num;
+
+        if (grid[wall_x][wall_y].type == empty && !besideStart(wall_x, wall_y, grid)) { // No need to check if it is duplicate, becuase it checks if it is empty
+            grid[wall_x][wall_y].type = wall;
+            i++;
+        }
+    }
+}
+
+void GenerateMarkers(int marker_num, Cell grid[grid_num][grid_num], int robot_x, int robot_y) {
+    srand(time(NULL));
+    int i = 0;
+    printf("Marker num: %d\n", marker_num);
+    while (i < marker_num) {
+        int marker_x = rand()%grid_num;
+        int marker_y = rand()%grid_num;
+        
+        if (grid[marker_x][marker_y].type == empty && checkReachable(robot_x, robot_y, marker_x, marker_y, grid) && !besideStart(marker_x, marker_y, grid)) {
+            grid[marker_x][marker_y].type = marker;
+            i++;
+        }
+        resetCellVisit(grid);
+    }
+}
+
+void drawMarkerOnRobot(Cell grid[grid_num][grid_num], int robot_x_num, int robot_y_num) {
+    setColour(red);
+    //Draw circle marker
+    int x = grid[robot_x_num][robot_y_num].x;
+    int y = grid[robot_x_num][robot_y_num].y;
+    
+    // fillOval(x+grid_size/4, y+grid_size/4, grid_size/2, grid_size/2);
+    //fillRect(x, y, grid_size, grid_size);
+    // displayImage("Star_onRobot.png", x+grid_size/5, y+grid_size/5);
+}
+
+
+// int depth_first_search(int* robot_x_num, int* robot_y_num, int prev_robot_x_num, int prev_robot_y_num, Stack *step_record, Cell grid[grid_num][grid_num], direction *robot_dir) {
+//     grid[*robot_x_num][*robot_y_num].visited = 1;
+    
+//     // Animation of move robot, each time by quarter of grid_size
+//     // for (int i = 1; i <= 10; i++) {
+//     //     float x_diff = grid[*robot_x_num][*robot_y_num].x - grid[prev_robot_x_num][prev_robot_y_num].x;
+//     //     float y_diff = grid[*robot_x_num][*robot_y_num].y - grid[prev_robot_x_num][prev_robot_y_num].y;
+//     //     placeRobot(grid[prev_robot_x_num][prev_robot_y_num].x+x_diff/10*i, grid[prev_robot_x_num][prev_robot_y_num].y+y_diff/10*i, *robot_dir, 0);
+//     // }
+//     sleep(50);
+//     placeRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir, 0);
+//     push(step_record, *robot_x_num);
+//     push(step_record, *robot_y_num);
+//     push(step_record, *robot_dir);
+    
+//     if (grid[*robot_x_num][*robot_y_num].type == marker) { // If marker is found
+//         grid[*robot_x_num][*robot_y_num].type = empty;
+//         drawBackground(grid);
+//         placeRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir ,1);
+//         return 1;
+//     }
+    
+//     for (int i = 0; i < 4; i++) {
+//         int new_x = *robot_x_num + dx[i];
+//         int new_y = *robot_y_num + dy[i];
+//         if (isValid(new_x, new_y) && grid[new_x][new_y].type == 3) {
+//             *robot_dir = i;
+//             if(depth_first_search(&new_x, &new_y, *robot_x_num, *robot_y_num, step_record, grid, robot_dir)) {
+//                 return 1;
+//             };
+//         }
+//     }
+
+//     for (int i = 0; i < 4; i++) {
+//         int new_x = *robot_x_num + dx[i];
+//         int new_y = *robot_y_num + dy[i];
+//         // sleep(100);
+//         if (isValid(new_x, new_y) && !grid[new_x][new_y].visited && grid[new_x][new_y].type != wall) {
+//             *robot_dir = i;
+//             // depth_first_search(&new_x, &new_y, *robot_x_num, *robot_y_num, grid, robot_dir);
+//             if(depth_first_search(&new_x, &new_y, *robot_x_num, *robot_y_num, step_record, grid, robot_dir)) {
+//                 return 1;
+//             };
+//         }
+//     }
+
+//     *robot_dir = getDirection(*robot_x_num, *robot_y_num, prev_robot_x_num, prev_robot_y_num);
+//     // for (int i = 1; i <= 10; i++) {
+//     //     float x_diff = grid[*robot_x_num][*robot_y_num].x - grid[prev_robot_x_num][prev_robot_y_num].x;
+//     //     float y_diff = grid[*robot_x_num][*robot_y_num].y - grid[prev_robot_x_num][prev_robot_y_num].y;
+//     //     placeRobot(grid[prev_robot_x_num][prev_robot_y_num].x-x_diff/10*i, grid[prev_robot_x_num][prev_robot_y_num].y-y_diff/10*i, *robot_dir);
+//     // }
+//     sleep(100);
+//     placeRobot(grid[prev_robot_x_num][prev_robot_y_num].x, grid[prev_robot_x_num][prev_robot_y_num].y, *robot_dir, 0);
+//     push(step_record, prev_robot_x_num);
+//     push(step_record, prev_robot_y_num);
+//     push(step_record, *robot_dir);
+//     return 0;
+// }
