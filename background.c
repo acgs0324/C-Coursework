@@ -28,7 +28,7 @@ void drawCell(Cell grid[grid_num][grid_num]) {
                 case wall:
                     setColour(black);
                     fillRect(grid[i][j].x, grid[i][j].y, grid_size, grid_size); break;
-                case start:
+                case home:
                     setColour(green);
                     fillRect(grid[i][j].x, grid[i][j].y, grid_size, grid_size); break;
                 case marker:

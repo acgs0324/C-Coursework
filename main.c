@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
         pickUpMarker(&robot, grid);
         resetCellVisit(grid);
         sleep(300);
-        returnToStart(&robot, step_record, grid);
+        returnToHome(&robot, step_record, grid);
         dropMarker(&robot, grid);
         sleep(1000);
         destroyStack(step_record);

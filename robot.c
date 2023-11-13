@@ -104,7 +104,7 @@ direction getDirection(int prev_robot_x_num, int prev_robot_y_num, int robot_x_n
 }
 
 int atHome(int robot_x_num, int robot_y_num, Cell grid[grid_num][grid_num]) {
-    return grid[robot_x_num][robot_y_num].type == start;
+    return grid[robot_x_num][robot_y_num].type == home;
 }
 
 int atMarker(robot robot, Cell grid[grid_num][grid_num]) {
@@ -124,7 +124,7 @@ void dropMarker(robot* robot, Cell grid[grid_num][grid_num]) {
     displayRobot(*robot, grid);
 }
 
-void checkStartAndResetStack(robot robot, Stack *step_record, Cell grid[grid_num][grid_num]) {
+void checkHomeAndResetStack(robot robot, Stack *step_record, Cell grid[grid_num][grid_num]) {
     for (int i = 0; i < 4; i++) {
         int new_x = robot.x_num + dx[i];
         int new_y = robot.y_num + dy[i];
@@ -138,7 +138,7 @@ void checkStartAndResetStack(robot robot, Stack *step_record, Cell grid[grid_num
     }
 }
 
-void returnToStart(robot* robot, Stack *step_record, Cell grid[grid_num][grid_num]) {
+void returnToHome(robot* robot, Stack *step_record, Cell grid[grid_num][grid_num]) {
     robot->dir = (pop(step_record) + 2) % 4;
     int prev_robot_y_num = pop(step_record);
     int prev_robot_x_num = pop(step_record);
@@ -151,7 +151,7 @@ void returnToStart(robot* robot, Stack *step_record, Cell grid[grid_num][grid_nu
         prev_robot_x_num = robot->x_num;
         displayRobot(*robot, grid);
         sleep(100);
-        checkStartAndResetStack(*robot, step_record, grid);
+        checkHomeAndResetStack(*robot, step_record, grid);
     }
 }
 
