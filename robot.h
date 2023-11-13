@@ -11,10 +11,19 @@ typedef enum {
     west = 3
 } direction;
 
-void placeRobot(int, int, direction, int);
+typedef struct {
+    int x_num;
+    int y_num;
+    direction dir;
+    int isCarryingAMarker;
+} robot;
+
+void displayRobot(robot, Cell [grid_num][grid_num]);
+void pickUpMarker(robot*, Cell [grid_num][grid_num]);
+void dropMarker(robot*, Cell [grid_num][grid_num]);
 direction getInitDirection(char* );
 direction getDirection(int, int, int, int);
-void returnToStart(int*, int*, direction*, Stack *, Cell [grid_num][grid_num]);
-int depth_first_search(int *, int *, int, int, Stack *, Cell [grid_num][grid_num], direction *);
+void returnToStart(robot*, Stack *, Cell [grid_num][grid_num]);
+int depth_first_search(robot*, int, int, Stack *, Cell [grid_num][grid_num]);
 
 #endif

@@ -419,3 +419,25 @@ void drawMarkerOnRobot(Cell grid[grid_num][grid_num], int robot_x_num, int robot
 //     push(step_record, *robot_dir);
 //     return 0;
 // }
+
+
+void updateRobotPosition(int* robot_x_num, int* robot_y_num, int prev_robot_x_num, int prev_robot_y_num, direction *robot_dir, Stack *step_record, Cell grid[grid_num][grid_num]) {
+    grid[*robot_x_num][*robot_y_num].visited = 1;
+    // int prev_robot_x_num = *robot_x_num + dx[(*robot_dir+ 2) % 4];
+    // int prev_robot_y_num = *robot_y_num + dy[(*robot_dir+ 2) % 4];
+    float x_diff = grid[*robot_x_num][*robot_y_num].x - grid[prev_robot_x_num][prev_robot_y_num].x;
+    float y_diff = grid[*robot_x_num][*robot_y_num].y - grid[prev_robot_x_num][prev_robot_y_num].y;
+    // if(getDirection(prev_robot_x_num, prev_robot_y_num, *robot_x_num, *robot_y_num) != *robot_dir) {
+    //     sleep(1000);
+    //     placeRobot(grid[prev_robot_x_num][prev_robot_y_num].x, grid[prev_robot_x_num][prev_robot_y_num].y, *robot_dir, 1);
+    //     sleep(1000);
+    // }
+    for (int i = 1; i <= 10; i++) {
+        placeRobot(grid[prev_robot_x_num][prev_robot_y_num].x+x_diff/10*i, grid[prev_robot_x_num][prev_robot_y_num].y+y_diff/10*i, *robot_dir, 0);
+        sleep(10);
+    }
+    // placeRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir, 0);
+    push(step_record, *robot_x_num);
+    push(step_record, *robot_y_num);
+    push(step_record, *robot_dir);
+}

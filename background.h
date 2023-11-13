@@ -29,6 +29,6 @@ void initCell(Cell grid[grid_num][grid_num]);
 void resetCellVisit(Cell grid[grid_num][grid_num]);
 void GenerateCells(int, type, Cell grid[grid_num][grid_num], int, int);
 void drawMarker(int, int);
-int canPlaceRobot(int, int);
+int canMoveForward(int, int);
 
 #endif

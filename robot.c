@@ -6,30 +6,61 @@
 #include "background.h"
 #include "Stack.h"
 
-void placeRobot(int x, int y, direction robot_dir, int isCarryingAMarker) {
+int isCarryingAMarker(robot robot) {
+    return robot.isCarryingAMarker == 1;
+}
+
+void displayRobot(robot robot, Cell grid[grid_num][grid_num]) {
     foreground();
     clear();
-    setColour(isCarryingAMarker ? red : blue);
+    setColour(isCarryingAMarker(robot) ? red : blue);
     int padding = 2;
-    x = x+padding;
-    y = y+padding;
+    int x = grid[robot.x_num][robot.y_num].x + padding;
+    int y = grid[robot.x_num][robot.y_num].y + padding;
     int size = grid_size - padding*2;
-
-    switch (robot_dir)  {
-    case north: //north
+    switch (robot.dir)  {
+    case north: 
         fillPolygon(3, (int[]){x, x+size/2, x+size}, (int[]){y+size, y, y+size});
         break;
-    case east: //east
+    case east: 
         fillPolygon(3, (int[]){x, x+size, x}, (int[]){y, y+size/2, y+size});
         break;
-    case south: //south
+    case south: 
         fillPolygon(3, (int[]){x, x+size/2, x+size}, (int[]){y, y+size, y});
         break;
-    case west: //west
+    case west: 
         fillPolygon(3, (int[]){x+size, x, x+size}, (int[]){y, y+size/2, y+size});
         break;
     }
-    // sleep(100);
+}
+
+void forward(robot robot, Stack *step_record, Cell grid[grid_num][grid_num]) {
+    grid[robot.x_num][robot.y_num].visited = 1;
+    displayRobot(robot, grid);
+    sleep(100);
+    push(step_record, robot.x_num);
+    push(step_record, robot.y_num);
+    push(step_record, robot.dir);
+}
+
+void left(robot* robot, Cell grid[grid_num][grid_num], Stack *step_record) {
+    sleep(100);
+    robot->dir = (robot->dir + 3) % 4;
+    push(step_record, robot->x_num);
+    push(step_record, robot->y_num);
+    push(step_record, robot->dir);
+    displayRobot(*robot, grid);
+    sleep(100);
+}
+
+void right(robot* robot, Cell grid[grid_num][grid_num], Stack *step_record) {
+    sleep(100);
+    robot->dir = (robot->dir + 1) % 4;
+    push(step_record, robot->x_num);
+    push(step_record, robot->y_num);
+    push(step_record, robot->dir);
+    displayRobot(*robot, grid);
+    sleep(100);
 }
 
 direction getInitDirection(char* direction) {
@@ -49,23 +80,55 @@ direction getInitDirection(char* direction) {
     }
 }
 
-direction getDirection(int prev_robot_x_num, int prev_robot_y_num, int robot_x_num, int robot_y_num) {
-    if (prev_robot_x_num < robot_x_num) {
-        return east; // Right
-    } else if (prev_robot_x_num > robot_x_num) {
-        return west; // Left
-    } else if (prev_robot_y_num < robot_y_num) {
-        return south; // Down
-    } else {
-        return north; // Up
+void changeDirection(direction prev_robot_dir, direction robot_dir, robot* robot, Cell grid[grid_num][grid_num], Stack *step_record) {
+    if (robot_dir == (prev_robot_dir + 1) % 4) {
+        right(robot, grid, step_record);
+    } else if (robot_dir == (prev_robot_dir + 3) % 4) {
+        left(robot, grid, step_record);
+    } else if (robot_dir == (prev_robot_dir + 2) % 4) {
+        right(robot, grid, step_record);
+        right(robot, grid, step_record);
     }
 }
 
-void checkStartAndResetStack(int robot_x_num, int robot_y_num, direction robot_dir, Stack *step_record, Cell grid[grid_num][grid_num]) {
+direction getDirection(int prev_robot_x_num, int prev_robot_y_num, int robot_x_num, int robot_y_num) {
+    if (prev_robot_x_num < robot_x_num) {
+        return east; 
+    } else if (prev_robot_x_num > robot_x_num) {
+        return west; 
+    } else if (prev_robot_y_num < robot_y_num) {
+        return south;
+    } else {
+        return north;
+    }
+}
+
+int atHome(int robot_x_num, int robot_y_num, Cell grid[grid_num][grid_num]) {
+    return grid[robot_x_num][robot_y_num].type == start;
+}
+
+int atMarker(robot robot, Cell grid[grid_num][grid_num]) {
+    return grid[robot.x_num][robot.y_num].type == marker;
+}
+
+void pickUpMarker(robot* robot, Cell grid[grid_num][grid_num]) {
+    grid[robot->x_num][robot->y_num].type = empty;
+    robot->isCarryingAMarker = 1;
+    drawBackground(grid);
+    displayRobot(*robot, grid);
+}
+
+void dropMarker(robot* robot, Cell grid[grid_num][grid_num]) {
+    sleep(200);
+    robot->isCarryingAMarker = 0;
+    displayRobot(*robot, grid);
+}
+
+void checkStartAndResetStack(robot robot, Stack *step_record, Cell grid[grid_num][grid_num]) {
     for (int i = 0; i < 4; i++) {
-        int new_x = robot_x_num + dx[i];
-        int new_y = robot_y_num + dy[i];
-        if (grid[new_x][new_y].type == start && canPlaceRobot(new_x, new_y)) {
+        int new_x = robot.x_num + dx[i];
+        int new_y = robot.y_num + dy[i];
+        if (atHome(new_x, new_y, grid) && canMoveForward(new_x, new_y)) {
             resetStack(step_record);
             push(step_record, new_x);
             push(step_record, new_y);
@@ -75,104 +138,68 @@ void checkStartAndResetStack(int robot_x_num, int robot_y_num, direction robot_d
     }
 }
 
-void returnToStart(int* robot_x_num, int* robot_y_num, direction* robot_dir, Stack *step_record, Cell grid[grid_num][grid_num]) {
-    *robot_dir = (pop(step_record) + 2) % 4;
+void returnToStart(robot* robot, Stack *step_record, Cell grid[grid_num][grid_num]) {
+    robot->dir = (pop(step_record) + 2) % 4;
     int prev_robot_y_num = pop(step_record);
     int prev_robot_x_num = pop(step_record);
     while (!isEmpty(step_record)) {
-        *robot_dir = (pop(step_record) + 2) % 4;
-        *robot_y_num = pop(step_record);
-        *robot_x_num = pop(step_record);
-        
-        // for (int i = 1; i <= 10; i++) {
-        //     float x_diff = grid[robot_x_num][robot_y_num].x - grid[prev_robot_x_num][prev_robot_y_num].x;
-        //     float y_diff = grid[robot_x_num][robot_y_num].y - grid[prev_robot_x_num][prev_robot_y_num].y;
-        //     placeRobot(grid[prev_robot_x_num][prev_robot_y_num].x+x_diff/10*i, grid[prev_robot_x_num][prev_robot_y_num].y+y_diff/10*i, robot_dir, 1);
-        //     sleep(10);
-        // }
-        prev_robot_y_num = *robot_y_num;
-        prev_robot_x_num = *robot_x_num;
-        placeRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir, 1);
-        sleep(50);
-        checkStartAndResetStack(*robot_x_num, *robot_y_num, *robot_dir, step_record, grid);
+        robot->dir = (pop(step_record) + 2) % 4;
+        robot->y_num = pop(step_record);
+        robot->x_num = pop(step_record);
+
+        prev_robot_y_num = robot->y_num;
+        prev_robot_x_num = robot->x_num;
+        displayRobot(*robot, grid);
+        sleep(100);
+        checkStartAndResetStack(*robot, step_record, grid);
     }
 }
 
-void updateRobotPosition(int* robot_x_num, int* robot_y_num, direction *robot_dir, Stack *step_record, Cell grid[grid_num][grid_num]) {
-    grid[*robot_x_num][*robot_y_num].visited = 1;
-    placeRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir, 0);
-    push(step_record, *robot_x_num);
-    push(step_record, *robot_y_num);
-    push(step_record, *robot_dir);
-    sleep(100);
-}
-
-int checkForMarker(int* robot_x_num, int* robot_y_num, direction *robot_dir, Cell grid[grid_num][grid_num], Stack *step_record) {
-    if (grid[*robot_x_num][*robot_y_num].type == marker) {
-        grid[*robot_x_num][*robot_y_num].type = empty;
-        drawBackground(grid);
-        push(step_record, *robot_x_num);
-        push(step_record, *robot_y_num);
-        push(step_record, *robot_dir);
-        placeRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir ,1);
-        return 1;
-    }
-    return 0;
-}
-
-int exploreBesides(int* robot_x_num, int* robot_y_num, Stack *step_record, Cell grid[grid_num][grid_num], direction *robot_dir, int visited, type type) {
+int exploreBesides(robot* robot, Stack *step_record, Cell grid[grid_num][grid_num], type type) {
+    direction prev_robot_dir = robot->dir;
     for (int i = 0; i < 4; i++) {
-        int new_x = *robot_x_num + dx[*robot_dir];
-        int new_y = *robot_y_num + dy[*robot_dir];
-        if (canPlaceRobot(new_x, new_y) && grid[new_x][new_y].visited == visited && grid[new_x][new_y].type == type) {
-            if(depth_first_search(&new_x, &new_y, *robot_x_num, *robot_y_num, step_record, grid, robot_dir)) {
+        int new_x = robot->x_num + dx[i];
+        int new_y = robot->y_num + dy[i];
+        if (canMoveForward(new_x, new_y) && grid[new_x][new_y].visited == 0 && grid[new_x][new_y].type == type) {
+            if (i != robot->dir) {
+                changeDirection(robot->dir, i, robot, grid, step_record);
+            }
+            int prev_robot_x_num = robot->x_num;
+            int prev_robot_y_num = robot->y_num;
+            robot->x_num = new_x;
+            robot->y_num = new_y;
+            if(depth_first_search(robot, prev_robot_x_num, prev_robot_y_num, step_record, grid)) {
                 return 1;
             };
         }
-        *robot_dir = (*robot_dir + 1) % 4;
     }
     return 0;
 }
 
-
-int depth_first_search(int* robot_x_num, int* robot_y_num, int prev_robot_x_num, int prev_robot_y_num, Stack *step_record, Cell grid[grid_num][grid_num], direction *robot_dir) {
-    updateRobotPosition(robot_x_num, robot_y_num, robot_dir, step_record, grid);
+int depth_first_search(robot* robot, int prev_robot_x_num, int prev_robot_y_num, Stack *step_record, Cell grid[grid_num][grid_num]) {
     
-    // grid[*robot_x_num][*robot_y_num].visited = 1;
-    // for (int i = 1; i <= 10; i++) {
-    //     float x_diff = grid[*robot_x_num][*robot_y_num].x - grid[prev_robot_x_num][prev_robot_y_num].x;
-    //     float y_diff = grid[*robot_x_num][*robot_y_num].y - grid[prev_robot_x_num][prev_robot_y_num].y;
-    //     placeRobot(grid[prev_robot_x_num][prev_robot_y_num].x+x_diff/10*i, grid[prev_robot_x_num][prev_robot_y_num].y+y_diff/10*i, *robot_dir, 0);
-    //     sleep(10);
-    // }
+    forward(*robot, step_record, grid);
 
-    // placeRobot(grid[*robot_x_num][*robot_y_num].x, grid[*robot_x_num][*robot_y_num].y, *robot_dir, 0);
-    push(step_record, *robot_x_num);
-    push(step_record, *robot_y_num);
-    push(step_record, *robot_dir);
-
-    if (checkForMarker(robot_x_num, robot_y_num, robot_dir, grid, step_record)) {
+    if (atMarker(*robot, grid)) {
         return 1;
     }
     
-    if (exploreBesides(robot_x_num, robot_y_num, step_record, grid, robot_dir, 0, marker)) { // Find marker around
+    if (exploreBesides(robot, step_record, grid, marker)) { 
         return 1;
     }
     
-    if (exploreBesides(robot_x_num, robot_y_num, step_record, grid, robot_dir, 0, empty)) { // Explore unvisited empty cell
+    if (exploreBesides(robot, step_record, grid, empty)) {
         return 1;
     }
-    *robot_dir = getDirection(*robot_x_num, *robot_y_num, prev_robot_x_num, prev_robot_y_num);
-    // for (int i = 1; i <= 10; i++) {
-    //     float x_diff = grid[prev_robot_x_num][prev_robot_y_num].x - grid[*robot_x_num][*robot_y_num].x;
-    //     float y_diff = grid[prev_robot_x_num][prev_robot_y_num].y - grid[*robot_x_num][*robot_y_num].y;
-    //     placeRobot(grid[*robot_x_num][*robot_y_num].x+x_diff/10*i, grid[*robot_x_num][*robot_y_num].x+y_diff/10*i, *robot_dir, 0);
-    // }
-    // // placeRobot(grid[prev_robot_x_num][prev_robot_y_num].x, grid[prev_robot_x_num][prev_robot_y_num].y, *robot_dir, 0);
-    // sleep(100);
-    push(step_record, prev_robot_x_num);
-    push(step_record, prev_robot_y_num);
-    push(step_record, *robot_dir);
-    updateRobotPosition(&prev_robot_x_num, &prev_robot_y_num, robot_dir, step_record, grid);
+
+    direction prev_robot_dir = robot->dir;
+    direction robot_dir = getDirection(robot->x_num, robot->y_num, prev_robot_x_num, prev_robot_y_num);
+    if (robot_dir != prev_robot_dir) {
+        changeDirection(prev_robot_dir, robot_dir, robot, grid, step_record);
+    }
+    robot->x_num = prev_robot_x_num;
+    robot->y_num = prev_robot_y_num;
+
+    forward(*robot, step_record, grid);
     return 0;
 }

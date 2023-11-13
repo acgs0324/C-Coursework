@@ -11,6 +11,7 @@
         "stdbool.h": "c",
         "time.h": "c",
         "bitset": "c",
-        "optional": "c"
+        "optional": "c",
+        "ios": "c"
     }
 }

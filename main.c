@@ -18,40 +18,43 @@ int main(int argc, char **argv) {
     Cell grid[grid_num][grid_num];
     initCell(grid);
 
-    int robot_x_num = 0;
-    int robot_y_num = 0;
-    direction robot_dir = north;
+    robot robot;
+    robot.x_num = 0;
+    robot.y_num = 0;
+    robot.dir = north;
+    robot.isCarryingAMarker = 0;
     
     if (argc == 4) {
-        robot_x_num = atoi(argv[1]);
-        robot_y_num = atoi(argv[2]);
-        robot_dir = getInitDirection(argv[3]);
+        robot.x_num = atoi(argv[1]);
+        robot.y_num = atoi(argv[2]);
+        robot.dir = getInitDirection(argv[3]);
         grid[atoi(argv[1])][atoi(argv[2])].type = 2;
     }
 
     srand(time(NULL));
     int wall_num = rand()%6 + 15;
-    int marker_num = rand()%6 + 7;
+    int marker_num = rand()%3 + 3;
 
-    GenerateCells(wall_num, wall, grid, robot_x_num, robot_y_num);
-    GenerateCells(marker_num, marker, grid, robot_x_num, robot_y_num);
+    GenerateCells(wall_num, wall, grid, robot.x_num, robot.y_num);
+    GenerateCells(marker_num, marker, grid, robot.x_num, robot.y_num);
 
     drawBackground(grid);
-    placeRobot(grid[robot_x_num][robot_y_num].x, grid[robot_x_num][robot_y_num].y, robot_dir, 0);
+    displayRobot(robot, grid);
     sleep(500);
     
-    int prev_robot_x_num = robot_x_num;
-    int prev_robot_y_num = robot_y_num;
-    while(marker_num > 0) {
+    int prev_robot_x_num = robot.x_num;
+    int prev_robot_y_num = robot.y_num;
+    while(marker_num > 0) { 
+        robot.x_num = prev_robot_x_num;
+        robot.y_num = prev_robot_y_num;
         Stack* step_record = createStack(100);
-        if(depth_first_search(&robot_x_num, &robot_y_num, prev_robot_x_num, prev_robot_y_num, step_record, grid, &robot_dir)) { //Start DFS
-            printf("Marker left: %d\n", --marker_num);
-        } else {
-            printf("No marker found\n");
-        }
+        depth_first_search(&robot, prev_robot_x_num, prev_robot_y_num, step_record, grid);
+        marker_num--;
+        pickUpMarker(&robot, grid);
         resetCellVisit(grid);
         sleep(300);
-        returnToStart(&robot_x_num, &robot_y_num, &robot_dir, step_record, grid);
+        returnToStart(&robot, step_record, grid);
+        dropMarker(&robot, grid);
         sleep(1000);
         destroyStack(step_record);
     }

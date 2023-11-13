@@ -19,7 +19,7 @@ void drawGrid() {
     }
 }
 
-void drawCell(Cell grid[grid_num][grid_num]) { //Paint the Cells
+void drawCell(Cell grid[grid_num][grid_num]) {
     for (int i = 0; i < grid_num; i++) {
         for (int j = 0; j < grid_num; j++) {
             switch (grid[i][j].type) {
