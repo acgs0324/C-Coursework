@@ -7,7 +7,7 @@
 #include "stack.h"
 #include "robot.h"
 
-const int cell_size = 80;
+const int cell_size = 60;
 const int cell_num = 10;
 int wall_num = 15;
 int marker_num = 5;

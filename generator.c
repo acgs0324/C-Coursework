@@ -12,10 +12,10 @@ int canMoveForward(int x_num, int y_num) {
     return (x_num >= 0 && x_num < cell_num && y_num >= 0 && y_num < cell_num);
 }
 
-void GenerateCells(int cell_num, type cell_type, Cell grid[cell_num][cell_num], int robot_x, int robot_y) { //Generate walls or markers
+void GenerateCells(int gen_cell_num, type cell_type, Cell grid[cell_num][cell_num], int robot_x, int robot_y) { //Generate walls or markers
     srand(time(NULL));
     int i = 0;
-    while (i < cell_num) {
+    while (i < gen_cell_num) {
         int cell_x = rand()%cell_num;
         int cell_y = rand()%cell_num;
 
