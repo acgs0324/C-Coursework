@@ -9,7 +9,7 @@
 
 const int cell_size = 60;
 const int cell_num = 10;
-int wall_num = 15;
+const int wall_num = 15;
 int marker_num = 5;
 
 int dx[] = {0, 1, 0, -1};
