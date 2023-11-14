@@ -36,13 +36,14 @@ int main(int argc, char **argv) {
         robot.x_num = atoi(argv[1]);
         robot.y_num = atoi(argv[2]);
         robot.dir = getInitDirection(argv[3]);
-        grid[atoi(argv[1])][atoi(argv[2])].type = 2;
     }
 
     if (canMoveForward(robot.x_num, robot.y_num) == 0) {
         printf("Invalid robot starting position\n");
         return 1;
     }
+    
+    grid[robot.x_num][robot.y_num].type = home;
 
     GenerateCells(wall_num, wall, grid, robot.x_num, robot.y_num);
     GenerateCells(marker_num, marker, grid, robot.x_num, robot.y_num);

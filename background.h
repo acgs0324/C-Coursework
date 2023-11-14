@@ -1,8 +1,8 @@
 #ifndef BACKGROUND_H
 #define BACKGROUND_H
 
-const int cell_num;
-const int cell_size;
+extern const int cell_num;
+extern const int cell_size;
 
 typedef enum {
     empty = 0,
