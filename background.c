@@ -3,7 +3,7 @@
 #include "background.h"
 #include <math.h>
 
-void drawBackground(Cell grid[grid_num][grid_num]) {
+void drawBackground(Cell grid[cell_num][cell_num]) {
     background();
     clear();
     drawCell(grid);
@@ -12,25 +12,25 @@ void drawBackground(Cell grid[grid_num][grid_num]) {
 
 void drawGrid() {
     setColour(black);
-    int end_vertex = grid_size*(grid_num + 1);
-    for (int i = 0; i <= grid_num*grid_size; i+=grid_size) {
-        drawLine(grid_size, grid_size+i, end_vertex, grid_size+i);
-        drawLine(grid_size+i, grid_size, grid_size+i, end_vertex);
+    int end_vertex = cell_size*(cell_num + 1);
+    for (int i = 0; i <= cell_num*cell_size; i+=cell_size) {
+        drawLine(cell_size, cell_size+i, end_vertex, cell_size+i);
+        drawLine(cell_size+i, cell_size, cell_size+i, end_vertex);
     }
 }
 
-void drawCell(Cell grid[grid_num][grid_num]) {
-    for (int i = 0; i < grid_num; i++) {
-        for (int j = 0; j < grid_num; j++) {
+void drawCell(Cell grid[cell_num][cell_num]) {
+    for (int i = 0; i < cell_num; i++) {
+        for (int j = 0; j < cell_num; j++) {
             switch (grid[i][j].type) {
                 case empty:
                     break;
                 case wall:
                     setColour(black);
-                    fillRect(grid[i][j].x, grid[i][j].y, grid_size, grid_size); break;
+                    fillRect(grid[i][j].x, grid[i][j].y, cell_size, cell_size); break;
                 case home:
                     setColour(green);
-                    fillRect(grid[i][j].x, grid[i][j].y, grid_size, grid_size); break;
+                    fillRect(grid[i][j].x, grid[i][j].y, cell_size, cell_size); break;
                 case marker:
                     setColour(red);
                     drawMarker(grid[i][j].x, grid[i][j].y); break;
@@ -39,17 +39,17 @@ void drawCell(Cell grid[grid_num][grid_num]) {
     }
 }
 
-void initCell(Cell grid[grid_num][grid_num]) {
-    for (int i = 0; i < grid_num; i++) {
-        for (int j = 0; j < grid_num; j++) {
-            grid[i][j] = (Cell) { .x = grid_size * (i + 1), .y = grid_size * (j + 1), .type = 0, .visited = 0 };
+void initCell(Cell grid[cell_num][cell_num]) {
+    for (int i = 0; i < cell_num; i++) {
+        for (int j = 0; j < cell_num; j++) {
+            grid[i][j] = (Cell) { .x = cell_size * (i + 1), .y = cell_size * (j + 1), .type = 0, .visited = 0 };
         }
     }
 }
 
-void resetCellVisit(Cell grid[grid_num][grid_num]) {
-    for (int i = 0; i < grid_num; i++) {
-        for (int j = 0; j < grid_num; j++) {
+void resetCellVisit(Cell grid[cell_num][cell_num]) {
+    for (int i = 0; i < cell_num; i++) {
+        for (int j = 0; j < cell_num; j++) {
             grid[i][j].visited = 0;
         }
     }
@@ -83,7 +83,7 @@ void drawMarker(int x, int y) {
     int depth = 3;
     x += 10;
     y += 10;
-    int size = grid_size - 20;
+    int size = cell_size - 20;
     double x1 = x, y1 = y + size * 4 / 5;
     double x2 = x + size, y2 = y + size * 4 / 5;
     double x3 = x + size / 2, y3 = y + size * 4 / 5 - sqrt(pow(size, 2) - pow(size / 2, 2));

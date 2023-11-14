@@ -1,8 +1,8 @@
 #ifndef BACKGROUND_H
 #define BACKGROUND_H
 
-const int grid_num;
-const int grid_size;
+const int cell_num;
+const int cell_size;
 
 typedef enum {
     empty = 0,
@@ -21,12 +21,12 @@ typedef struct {
 int dx[4];
 int dy[4];
 
-void drawBackground(Cell grid[grid_num][grid_num]);
+void drawBackground(Cell grid[cell_num][cell_num]);
 void drawGrid();
-void drawCell(Cell grid[grid_num][grid_num]);
-void initCell(Cell grid[grid_num][grid_num]);
-void resetCellVisit(Cell grid[grid_num][grid_num]);
-void GenerateCells(int, type, Cell grid[grid_num][grid_num], int, int);
+void drawCell(Cell grid[cell_num][cell_num]);
+void initCell(Cell grid[cell_num][cell_num]);
+void resetCellVisit(Cell grid[cell_num][cell_num]);
+void GenerateCells(int, type, Cell grid[cell_num][cell_num], int, int);
 void drawMarker(int, int);
 int canMoveForward(int, int);
 

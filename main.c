@@ -4,18 +4,26 @@
 #include <ctype.h>
 #include "graphics.h"
 #include "background.h"
-#include "Stack.h"
+#include "stack.h"
 #include "robot.h"
 
-const int grid_size = 60;
-const int grid_num = 10;
+const int cell_size = 80;
+const int cell_num = 10;
+int wall_num = 15;
+int marker_num = 5;
+
 int dx[] = {0, 1, 0, -1};
 int dy[] = {-1, 0, 1, 0};
 
 int main(int argc, char **argv) {
-    setWindowSize(grid_size*(grid_num+2), grid_size*(grid_num+2));
+    int window_size = cell_size*(cell_num+2);
+    if (window_size > 1500) {
+        printf("Window_size too large\n");
+        return 1;
+    }
+    setWindowSize(window_size, window_size);
     
-    Cell grid[grid_num][grid_num];
+    Cell grid[cell_num][cell_num];
     initCell(grid);
 
     robot robot;
@@ -31,9 +39,10 @@ int main(int argc, char **argv) {
         grid[atoi(argv[1])][atoi(argv[2])].type = 2;
     }
 
-    srand(time(NULL));
-    int wall_num = rand()%6 + 15;
-    int marker_num = rand()%3 + 3;
+    if (canMoveForward(robot.x_num, robot.y_num) == 0) {
+        printf("Invalid robot starting position\n");
+        return 1;
+    }
 
     GenerateCells(wall_num, wall, grid, robot.x_num, robot.y_num);
     GenerateCells(marker_num, marker, grid, robot.x_num, robot.y_num);

@@ -2,7 +2,7 @@
 #define ROBOT_H
 
 #include "background.h"
-#include "Stack.h"
+#include "stack.h"
 
 typedef enum {
     north = 0,
@@ -18,12 +18,12 @@ typedef struct {
     int isCarryingAMarker;
 } robot;
 
-void displayRobot(robot, Cell [grid_num][grid_num]);
-void pickUpMarker(robot*, Cell [grid_num][grid_num]);
-void dropMarker(robot*, Cell [grid_num][grid_num]);
+void displayRobot(robot, Cell [cell_num][cell_num]);
+void pickUpMarker(robot*, Cell [cell_num][cell_num]);
+void dropMarker(robot*, Cell [cell_num][cell_num]);
 direction getInitDirection(char* );
 direction getDirection(int, int, int, int);
-void returnToHome(robot*, Stack *, Cell [grid_num][grid_num]);
-int depth_first_search(robot*, int, int, Stack *, Cell [grid_num][grid_num]);
+void returnToHome(robot*, Stack *, Cell [cell_num][cell_num]);
+int depth_first_search(robot*, int, int, Stack *, Cell [cell_num][cell_num]);
 
 #endif
